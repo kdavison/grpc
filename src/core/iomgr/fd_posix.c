@@ -355,13 +355,13 @@ gpr_uint32 grpc_fd_begin_poll(grpc_fd *fd, grpc_pollset *pollset,
 
   gpr_mu_lock(&fd->watcher_mu);
   /* if there is nobody polling for read, but we need to, then start doing so */
-  if (!fd->read_watcher && gpr_atm_acq_load(&fd->readst) > READY) {
+  if (!fd->read_watcher && gpr_atm_acq_load(&fd->readst) != NOT_READY) {
     fd->read_watcher = watcher;
     mask |= read_mask;
   }
   /* if there is nobody polling for write, but we need to, then start doing so
    */
-  if (!fd->write_watcher && gpr_atm_acq_load(&fd->writest) > READY) {
+  if (!fd->write_watcher && gpr_atm_acq_load(&fd->writest) != NOT_READY) {
     fd->write_watcher = watcher;
     mask |= write_mask;
   }
